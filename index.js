@@ -34,18 +34,22 @@ const FIRST_STATUS_ID = 60222734
 
 
 app.get('/', (req, res) => {
-    if (process.env.EXPIRATION_TIME > Date.now()) {
-        handleRequest(req, res)
-            .catch(err => { console.log(err) })
-            .then(resolve => { res.send('OK') })
+    if (res && res.length > 0) {
+        if (process.env.EXPIRATION_TIME > Date.now()) {
+            handleRequest(req, res)
+                .catch(err => { console.log(err) })
+                .then(resolve => { res.send('OK') })
+        } else {
+            requestToken()
+                .then(() => {
+                    // Обрабатываем запрос
+                    handleRequest(req, res)
+                        .catch(err => { console.log(err) })
+                        .then(resolve => { res.send('OK') })
+                })
+        }
     } else {
-        requestToken()
-            .then(() => {
-                // Обрабатываем запрос
-                handleRequest(req, res)
-                    .catch(err => { console.log(err) })
-                    .then(resolve => { res.send('OK') })
-            })
+        res.send('Пожалуйста, передайте query параметры')
     }
 })
 
